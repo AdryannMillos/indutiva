@@ -2,7 +2,6 @@ const Models = require("../../../models/index");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-
 async function store(req, res) {
   const { userName, password, email, confirmPassword } = req.body;
   try {
@@ -62,7 +61,11 @@ async function update(req, res) {
             updatedUser.password = hash;
             console.log(updatedUser.password);
             Models.User.update(
-              { userName: updatedUser.userName, email: updatedUser.email, password:  updatedUser.password },
+              {
+                userName: updatedUser.userName,
+                email: updatedUser.email,
+                password: updatedUser.password,
+              },
               { where: { id: userId } }
             );
             return res
@@ -94,15 +97,11 @@ async function destroy(req, res) {
 
 const login = async (req, res) => {
   const { email, password } = req.body;
-  const userWithEmail = await Models.User.findOne({ where: { email } }).catch(
-    (error) => {
-      res.send("Error: ", error.message);
-    }
-  );
+  const userWithEmail = await Models.User.findOne({ where: { email } });
   if (!userWithEmail) {
     return res.status(401).json({ message: "Email or password not found" });
   }
-  if (!bcrypt.compareSync(password, userWithEmail.password)){
+  if (!bcrypt.compareSync(password, userWithEmail.password)) {
     return res.status(401).json({ message: "Email or password not found" });
   }
 
@@ -118,7 +117,7 @@ const login = async (req, res) => {
     }
   );
 
-  res.status(200).send({message: "Welcome Back!", token: jwtToken});
+  res.status(200).send({ message: "Welcome Back!", token: jwtToken });
 };
 
 module.exports = {
@@ -126,5 +125,5 @@ module.exports = {
   index,
   update,
   destroy,
-  login
+  login,
 };
